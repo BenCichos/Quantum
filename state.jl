@@ -152,3 +152,10 @@ tr(op::Operator) = tr(data(op))
 # Hilbert Space
 hilbertspace(::QuantumState{D}) where {D} = D^2
 hilbertspace(::Operator{D}) where {D} = D^2
+
+# Get Index
+getindex(k::Ket, i::Int) = data(k)[i]
+getindex(b::Bra, i::Int) = data(b)[i]
+
+getindex(op::Operator, i::Int) = data(op)[i]
+getindex(op::Operator, i::Int, j::Int) = data(op)[i, j]

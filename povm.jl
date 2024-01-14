@@ -20,4 +20,6 @@ sicpovm_projectors = begin
     1 / sqrt(5 + sqrt(5)) .* sic_povm
 end
 
+
+
 sicpovm_matrices = map(Operator, sicpovm_projectors)
