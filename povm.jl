@@ -21,5 +21,4 @@ sicpovm_projectors = begin
 end
 
 
-
 sicpovm_matrices = map(Operator, sicpovm_projectors)

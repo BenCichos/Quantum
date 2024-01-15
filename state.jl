@@ -8,6 +8,8 @@ struct Ket{D} <: QuantumState{D}
     end
 end
 
+Ket(args::T...) where {T <: Number} = Ket(collect(args))
+
 struct Bra{D} <: QuantumState{D}
     data::Vector{ComplexF64}
     function Bra(v::Vector{T}) where {T <: Number}
@@ -15,6 +17,8 @@ struct Bra{D} <: QuantumState{D}
         new{length(v)}(v)
     end
 end
+
+Bra(args::T...) where {T <: Number} = Bra(collect(args))
 
 abstract type AbstractOperator{D} end
 

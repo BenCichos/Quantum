@@ -1,66 +1,3 @@
-function plot_fidelities_fourlevel(μ::Vector{Float64}, σ::Vector{Float64})
-    f = Figure(size=(600, 400), fonts=(; regular="Times New Roman"))
-    
-    ax = Axis(
-        f[1, 1],
-        limits=((0, 100), (0.4, 1)),
-        xticks=0:25:101,
-        yticks=0.4:0.1:1,
-        xminorticks=IntervalsBetween(5),
-        xminorticksvisible=true,
-        yminorticks=IntervalsBetween(2),
-        yminorticksvisible=true,
-        xgridvisible=false,
-        ygridvisible=false,
-        xlabel="Iterations",
-        ylabel="Fidelity",
-        xlabelsize=18,
-        ylabelsize=18,
-        xticklabelsize=16,
-        yticklabelsize=16
-    )
-
-    upper, lower = μ + σ, μ - σ
-
-    band!(ax, 1:length(μ), upper, lower, color=(:blue, 0.2), label="Standard Deviation")
-    lines!(ax, 1:length(μ), μ, color=:blue, label="Average Fidelity")
-    axislegend(ax, position=:rb, labelsize=18)
-    
-    f
-end
-
-function plot_fidelities_twolevel(μ::Vector{Float64}, σ::Vector{Float64})
-    f = Figure(size=(600, 400), fonts=(; regular="Times New Roman"))
-    
-    ax = Axis(
-        f[1, 1],
-        limits=((1, 10), (0.4, 1)),
-        xticks=1:1:10,
-        yticks=0.4:0.1:1,
-        xminorticks=IntervalsBetween(5),
-        xminorticksvisible=true,
-        yminorticks=IntervalsBetween(2),
-        yminorticksvisible=true,
-        xgridvisible=false,
-        ygridvisible=false,
-        xlabel="Iterations",
-        ylabel="Fidelity",
-        xlabelsize=18,
-        ylabelsize=18,
-        xticklabelsize=16,
-        yticklabelsize=16
-    )
-
-    upper, lower = μ + σ, μ - σ
-
-    band!(ax, 1:length(μ), upper, lower, color=(:blue, 0.2), label="Standard Deviation")
-    lines!(ax, 1:length(μ), μ, color=:blue, label="Average Fidelity")
-    axislegend(ax, position=:rb, labelsize=18)
-    
-    f
-end
-
-
 # define sphere and splines
 
 function sphere(radius::T, center::NTuple{3, T}; n::Int=100) where {T <: Real}
@@ -82,21 +19,17 @@ function splines(radius::T, center::NTuple{3, T}; n::Int=100) where {T <: Real}
     [offseted.(0.0, x, y)..., Point3f(NaN), offseted.(x,0.0,y)...,  Point3f(NaN), offseted.(x,y,0.0)...]
 end
 
-
 # define plotting function for sphere and splines
 
 function plot_sphere(radius::T, center::NTuple{3, T}; n::Int=100) where {T <: Real}
-    x, y, z = sphere(radius, center; n=n)
     f = Figure()
     ax = Axis3(f[1, 1])
-    surface!(ax, sphere(1.0, (0.0, 0.0, 0.0))..., transparency=true, color=fill((:gray, 0.1), 100, 100), shading=NoShading)
+    surface!(ax, sphere(radius, center; n=n)..., transparency=true, color=fill((:gray, 0.1), 100, 100), shading=NoShading)
     f, ax
 end
 
 function plot_sphere!(ax::Axis3, radius::T, center::NTuple{3, T}; n::Int=100) where {T <: Real}
-    x, y, z = sphere(radius, center; n=n)
-    surface!(ax, sphere(1.0, (0.0, 0.0, 0.0))..., transparency=true, color=fill((:gray, 0.1), 100, 100), shading=NoShading)
-    ax
+    surface!(ax, sphere(radius, center; n=n)..., transparency=true, color=fill((:gray, 0.1), 100, 100), shading=NoShading)
 end
 
 function plot_splines(radius::T=1.0, center::NTuple{3, T}=(0.0,0.0,0.0); n::Int=100) where {T <: Real}
@@ -108,6 +41,56 @@ end
 
 function plot_splines!(ax::Axis3, radius::T, center::NTuple{3, T}; n::Int=100) where {T <: Real}
     lines!(ax, splines(radius, center), color=(:gray, 0.5), linewidth=1.0, overdraw=true)
+end
+
+function plot_bases()
+    f = Figure()
+    ax = Axis3(f[1,1])
+    scatter!(ax, Point3f(0), color=:black, markersize=12)
+    scatterlines!(ax, [Point3f(0, 0, 1), Point3f(0, 0, -1)], color=:red, markersize=12)
+    scatterlines!(ax, [Point3f(0, 1, 0), Point3f(0, -1, 0)], color=:blue, markersize=12)
+    scatterlines!(ax, [Point3f(1, 0, 0), Point3f(-1, 0, 0)], color=:green, markersize=12)
+    text!(ax, [
+        Point3f(0,0,1.3), Point3f(0,0,-1.3), 
+        Point3f(0,1.3,0),Point3f(0,-1.3,0), 
+        Point3f(1.3,0,0), Point3f(-1.3,0,0)],
+    text = [
+        L"|0 \rangle", L"|1 \rangle", 
+        L"|+ \rangle", L"|- \rangle", 
+        L"|R \rangle", L"|L \rangle"],
+    fontsize=18,
+    align=[
+        (:center, :center), (:center, :center), 
+        (:center, :center), (:center, :center), 
+        (:center, :center), (:center, :center)]
+    )
+    f, ax
+end
+
+function plot_bases!(ax::Axis3, radius::T, center::NTuple{3, T}; text_spacing::Float64=0.3) where {T <: Real}
+    
+    text_radius = radius + text_spacing
+    scatter!(ax, Point3f(center...), color=:black, markersize=12)
+    
+    Offset(x::Real, y::Real, z::Real) = Point3f(x + center[1], y + center[2], z + center[3])
+
+    scatterlines!(ax, [Offset(0, 0, radius), Offset(0, 0, -radius)], color=:red, markersize=12)
+    scatterlines!(ax, [Offset(0, radius, 0), Offset(0, -radius, 0)], color=:blue, markersize=12)
+    scatterlines!(ax, [Offset(1, 0, 0), Offset(-1, 0, 0)], color=:green, markersize=12)
+    text!(ax, [
+        Offset(0,0,text_radius), Offset(0,0,-text_radius), 
+        Offset(0,text_radius,0),Offset(0,-text_radius,0), 
+        Offset(text_radius,0,0), Offset(-text_radius,0,0)],
+    text = [
+        L"|0 \rangle", L"|1 \rangle", 
+        L"|+ \rangle", L"|- \rangle", 
+        L"|R \rangle", L"|L \rangle"],
+    fontsize=18,
+    align=[
+        (:center, :center), (:center, :center), 
+        (:center, :center), (:center, :center), 
+        (:center, :center), (:center, :center)]
+    )
 end
 
 
@@ -135,36 +118,101 @@ function blochsphere(radius::T=1.0, center::NTuple{3, T}=(0.0,0.0,0.0); n::Int=1
         yticklabelsvisible=false,
         zticklabelsvisible=false,
     )
-
-    surface!(ax, sphere(radius, center, n=n)..., transparency=true, color=fill((:gray, 0.1), 100, 100), shading=NoShading)
-    lines!(ax, splines(radius, center, n=n), color=(:gray, 0.5), linewidth=1.0, overdraw=true)
-
-    scatter!(ax, Point3f(0), color=:black, markersize=12)
-    scatterlines!(ax, [Point3f(0, 0, 1), Point3f(0, 0, -1)], color=:red, markersize=12)
-    scatterlines!(ax, [Point3f(0, 1, 0), Point3f(0, -1, 0)], color=:blue, markersize=12)
-    scatterlines!(ax, [Point3f(1, 0, 0), Point3f(-1, 0, 0)], color=:green, markersize=12)
-    text!(ax, [
-        Point3f(0,0,1.3), Point3f(0,0,-1.3), 
-        Point3f(0,1.3,0),Point3f(0,-1.3,0), 
-        Point3f(1.3,0,0), Point3f(-1.3,0,0)],
-    text = [
-        L"|0 \rangle", L"|1 \rangle", 
-        L"|+ \rangle", L"|- \rangle", 
-        L"|R \rangle", L"|L \rangle"],
-    fontsize=18,
-    align=[
-        (:center, :center), (:center, :center), 
-        (:center, :center), (:center, :center), 
-        (:center, :center), (:center, :center)]
-    )
+    
+    plot_sphere!(ax, radius, center, n=n)
+    plot_splines!(ax, radius, center, n=n)
+    plot_bases!(ax, radius, center)
+    
 
     f, ax
 end
 
-function blochvector(state::QuantumState{2})
-    ρ̂ = density(state)
-    return Point3f(2*real(ρ̂[1,2]), 2*imag(ρ̂[1,2]), real(ρ̂[1,1] - ρ̂[2,2]))
+# compute bloch vector
+
+blochvector(ρ̂::Operator{2}) = Point3f(2*real(ρ̂[1,2]), 2*imag(ρ̂[1,2]), real(ρ̂[1,1] - ρ̂[2,2]))
+blochvector(state::T) where {T <: QuantumState{2}} = blochvector(density(state))
+
+# add state to bloch sphere
+
+state!(ax::Axis3, state::T; color::Symbol=:black) where {T <: QuantumState{2}} = scatterlines!(ax, [Point3f(0), blochvector(state)], color=color)
+states!(ax::Axis3, states::Vector{T}; color::Symbol=:gray) where {T <: QuantumState{2}} = isempty(states) || scatterlines!(ax, blochvector.(states), color=color)
+
+
+struct BlochSphere{T <: QuantumState{2}}
+    blochsphere::Function
+    states::Vector{T}
+
+    function BlochSphere(blochsphere::Function, states::Vector{T}) where {T <: QuantumState{2}}
+        new{T}(blochsphere, states)
+    end
+end 
+
+BlochSphere(;radius::Float64=1.0, center::NTuple{3, Float64}=(0.0,0.0,0.0), states::Vector{T}=Ket{2}[], n::Int=100) where {T <: QuantumState{2}} = BlochSphere(() -> blochsphere(radius, center; n=n), states)
+
+blochsphere(bs::BlochSphere) = bs.blochsphere
+states(bs::BlochSphere) = bs.states
+push!(bs::BlochSphere, state::T) where {T <: QuantumState{2}} = (push!(bs.states, state); bs)
+push!(bs::BlochSphere, states::T...) where {T <: QuantumState{2}} = (push!(bs.states, states...); bs)
+append!(bs::BlochSphere, states::Vector{T}) where {T <: QuantumState{2}} = (append!(bs.states, states); bs)
+
+function plot(bs::BlochSphere; plot_states::Bool=true)
+    f, ax = blochsphere(bs)()
+    plot_states && states!(ax, states(bs))
+    f
 end
 
-state!(ax::Axis3, state::QuantumState{2}; color::Symbol=:black) = scatterlines!(ax, [Point3f(0), blochvector(state)], color=color)
-states!(ax::Axis3, states::Vector{QState}; color::Symbol=:gray) where {QState <: QuantumState{2}} = scatterlines!(ax, blochvector.(states), color=color)
+
+# plotting density matrix as three-dimensional bar chart
+    
+function matrixplot(ρ̂::Operator) 
+    ρ̂_data = vec(data(ρ̂))
+    ρ̂_real = real(ρ̂_data)
+    ρ_imag = imag(ρ̂_data)
+    
+    f = Figure(size=(1200,350))
+
+    xs = map(x -> x-0.5, 1:dims(ρ̂))
+    ys = map(y -> y-0.5, 1:dims(ρ̂))
+    zs = fill(0, dims(ρ̂), dims(ρ̂))
+
+    kwargs = (;
+        limits=((0, dims(ρ̂)), (0, dims(ρ̂)), (-1, 1)),
+        xticks=xs,
+        yticks=ys,
+        zticks=-1:0.5:1,
+        zgridvisible=false,
+        xgridvisible=false,
+        ygridvisible=false,
+        aspect=(1.0, 1.0, 0.3),
+        xlabel="",
+        ylabel="",
+        zlabel="",
+        yreversed=true,
+        xtickformat= _ -> [L"$ | %$(i-1) \rangle $" for i in 1:dims(ρ̂)],
+        ytickformat= _ -> [L"$ | %$(i-1) \rangle $" for i in 1:dims(ρ̂)],
+        ztickformat=zs -> [L"%$z" for z in zs],
+        titlesize=28,
+        xticklabelsize=24,
+        yticklabelsize=24,
+        zticklabelsize=24
+    )
+
+    barkwargs(data::Vector{T}) where {T <: Real} = (;
+        marker=Rect(Vec3(-0.5, -0.5, 0.0), Vec3(1)),
+        markersize=Vec3.(0.3, 0.3, data),
+        color=data,
+        colormap=:viridis,
+        shading=FastShading,
+    )
+
+    axis_real = Axis3(f[1, 1]; title=L"Re(\hat{\rho})", kwargs...)
+    axis_imag = Axis3(f[1, 2]; title=L"Im(\hat{\rho})", kwargs...)
+
+
+    meshscatter!(axis_real, xs, ys, zs; barkwargs(ρ̂_real)...)
+    meshscatter!(axis_imag, xs, ys, zs; barkwargs(ρ_imag)...)
+
+    f
+end
+
+matrixplot(state::T) where {T <: QuantumState} = matrixplot(density(state))

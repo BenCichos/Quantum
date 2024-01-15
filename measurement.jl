@@ -29,7 +29,12 @@ expectation(ϕ::Bra{D}, ρ̂::Operator{D}) where {D} = real(ϕ * ρ̂ * dag(ϕ))
 
 
 fidelity(ρ̂::Operator{D}, σ̂::Operator{D}) where {D} = real(tr(ρ̂ * σ̂))
+fidelities(ρ̂s::Vector{Operator{D}}, σ̂s::Vector{Operator{D}}) where {D} = map((ρ̂,σ̂) -> fidelity(ρ̂, σ̂), ρ̂s, σ̂s)
+fidelities(ρ̂s::Vector{Operator{D}}, σ̂::Operator{D}) where {D} = map(ρ̂ -> fidelity(ρ̂, σ̂), ρ̂s)
+
 fidelity(ϕ::QuantumState{D}, ψ::QuantumState{D}) where {D} = real(tr(density(ϕ) * density(ψ)))
+fidelities(ϕs::Vector{QuantumState{D}}, ψs::Vector{QuantumState{D}}) where {D} = map((ϕ,ψ) -> fidelity(ϕ, ψ), ϕs, ψs)
+fidelities(ϕs::Vector{QuantumState{D}}, ψ::QuantumState{D}) where {D} = map(ϕ -> fidelity(ϕ, ψ), ϕs)
 
 
 # Pauli Matrices Two Level Quantum Systems
