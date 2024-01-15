@@ -1,4 +1,5 @@
-rand(::Type{Ket{N}}) where {N} = Ket(normalize!(rand(ComplexF64, N)))
-rand(::Type{Bra{N}}) where {N} = Bra(normalize!(rand(ComplexF64, N)))
-randket(d::Int) = Ket(normalize!(rand(ComplexF64, d)))
-randbra(d::Int) = Bra(normalize!(rand(ComplexF64, d)))
+rand(rng::AbstractRNG, ::SamplerType{Ket{N}}) where {N} = Ket(normalize!(rand(rng, ComplexF64, N)))
+rand(rng::AbstractRNG, ::SamplerType{Bra{N}}) where {N} = Bra(normalize!(rand(rng, ComplexF64, N)))
+
+randket(d::Int) = rand(Ket{d})
+randbra(d::Int) = rand(Bra{d})

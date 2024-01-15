@@ -3,7 +3,9 @@ using Distributions
 using GLMakie
 import GLMakie: plot
 import LinearAlgebra: normalize!, normalize, tr
-import Base: +, -, *, /, conj, transpose, adjoint, kron, rand, vec, getindex, push!
+import Base: +, -, *, /, conj, transpose, adjoint, kron, vec, getindex, push!
+using Random: AbstractRNG, SamplerType
+import Random: rand
 
 
 include("state.jl")
