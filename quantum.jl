@@ -1,12 +1,11 @@
 using StatsBase
 using Distributions
 using GLMakie
+
 import GLMakie: plot
 import LinearAlgebra: normalize!, normalize, tr
 import Base: +, -, *, /, conj, transpose, adjoint, kron, vec, getindex, push!
-using Random: AbstractRNG, SamplerType
-import Random: rand
-
+import Random: AbstractRNG, SamplerType, rand
 
 include("state.jl")
 include("rand.jl")
