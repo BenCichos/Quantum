@@ -54,6 +54,7 @@ function sgqt(ρ̂::Operator{4}, iterations::Int; measures::AbstractVector=pauli
         push!(ψs, ϕᵢ)
         ϕᵢ = sgqt_walk(ρ̂, ϕᵢ, measures, cardinality, i, paramsᵦ, paramsᵧ, weights)
     end
+    ψs
 end
 
 sgqt(ϕ::Ket{4}, iterations::Int; measures::AbstractVector=paulimatrices(4), cardinality::Int=8, paramsᵦ::NamedTuple=(b=0.1, t=1/6), paramsᵧ::NamedTuple=(a=3.0, A=0.0, s=1.0), weights::Vector{Float64}=fill(1/16, 16)) = sgqt(density(ϕ), iterations; measures=measures, cardinality=cardinality, paramsᵦ=paramsᵦ, paramsᵧ=paramsᵧ, weights=weights)
