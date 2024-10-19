@@ -51,7 +51,7 @@ data(op::Operator) = op.data
 dims(::AbstractOperator{D}) where {D} = D
 
 # Mutliplication of Quantum States
-*(k::Ket, b::Bra) = vec(k) * vec(b)
+*(k::Ket, b::Bra) = Operator(vec(k) * vec(b))
 *(b::Bra, k::Ket) = vec(b) * vec(k)
 *(op::Operator, k::Ket) = Ket(mat(op) * vec(k))
 *(b::Bra, op::Operator) = Bra(transpose(vec(b) * mat(op)))
@@ -129,7 +129,7 @@ conj!(op::Operator) = (data(op) .= conj(data(op)); return op)
 # Adjoint
 adjoint(k::Ket) = Bra(conj(data(k)))
 adjoint(b::Bra) = Ket(conj(data(b)))
-adjoint(op::Operator) = Operator(adjoint(data(op)))
+adjoint(op::Operator) = Operator(Array(adjoint(data(op))))
 
 adjoint!(op::Operator) = (data(op) .= adjoint(data(op)); return op)
 
@@ -138,6 +138,7 @@ adjoint!(op::Operator) = (data(op) .= adjoint(data(op)); return op)
 dag(k::Ket) = adjoint(k)
 dag(b::Bra) = adjoint(b)
 dag(op::Operator) = adjoint(op)
+
 
 dag!(op::Operator) = adjoint!(op)
 
@@ -163,3 +164,13 @@ getindex(b::Bra, i::Int) = data(b)[i]
 
 getindex(op::Operator, i::Int) = data(op)[i]
 getindex(op::Operator, i::Int, j::Int) = data(op)[i, j]
+
+
+# inner product
+inner(k1::Ket, k2::Ket) = dag(k1) * k2 
+innner(k::Ket) = inner(k, k)
+
+
+# outer product
+outer(k1::Ket{D}, k2::Ket{D}) where {D} = k1 * dag(k2)
+outer(k::Ket) = density(k)

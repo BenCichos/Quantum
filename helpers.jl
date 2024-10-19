@@ -1,0 +1,1 @@
+isapprox(π̂::Operator{D}, σ̂::Operator{D}) where {D} = isapprox(data(π̂), data(σ̂))

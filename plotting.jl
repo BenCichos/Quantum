@@ -158,7 +158,7 @@ append!(bs::BlochSphere, states::Vector{T}) where {T <: QuantumState{2}} = (appe
 function plot(bs::BlochSphere; plot_states::Bool=true)
     f, ax = blochsphere(bs)()
     plot_states && states!(ax, states(bs))
-    f
+    f, ax
 end
 
 
@@ -169,7 +169,7 @@ function matrixplot(ρ̂::Operator)
     ρ̂_real = real(ρ̂_data)
     ρ_imag = imag(ρ̂_data)
     
-    f = Figure(size=(1200,350))
+    f = Figure(size=(600, 900))
 
     xs = map(x -> x-0.5, 1:dims(ρ̂))
     ys = map(y -> y-0.5, 1:dims(ρ̂))
@@ -183,14 +183,14 @@ function matrixplot(ρ̂::Operator)
         zgridvisible=false,
         xgridvisible=false,
         ygridvisible=false,
-        aspect=(1.0, 1.0, 0.3),
+        aspect=(1.0, 1.0, 0.5),
         xlabel="",
         ylabel="",
         zlabel="",
         yreversed=true,
         xtickformat= _ -> [L"$ | %$(i-1) \rangle $" for i in 1:dims(ρ̂)],
         ytickformat= _ -> [L"$ | %$(i-1) \rangle $" for i in 1:dims(ρ̂)],
-        ztickformat=zs -> [L"%$z" for z in zs],
+        ztickformat= zs -> [L"%$z" for z in zs],
         titlesize=28,
         xticklabelsize=24,
         yticklabelsize=24,
@@ -199,20 +199,20 @@ function matrixplot(ρ̂::Operator)
 
     barkwargs(data::Vector{T}) where {T <: Real} = (;
         marker=Rect(Vec3(-0.5, -0.5, 0.0), Vec3(1)),
-        markersize=Vec3.(0.3, 0.3, data),
+        markersize=Vec3.(0.7, 0.7, data),
         color=data,
         colormap=:viridis,
         shading=FastShading,
     )
 
     axis_real = Axis3(f[1, 1]; title=L"Re(\hat{\rho})", kwargs...)
-    axis_imag = Axis3(f[1, 2]; title=L"Im(\hat{\rho})", kwargs...)
+    axis_imag = Axis3(f[2, 1]; title=L"Im(\hat{\rho})", kwargs...)
 
 
     meshscatter!(axis_real, xs, ys, zs; barkwargs(ρ̂_real)...)
     meshscatter!(axis_imag, xs, ys, zs; barkwargs(ρ_imag)...)
 
-    f
+    f, ax
 end
 
 matrixplot(state::T) where {T <: QuantumState} = matrixplot(density(state))

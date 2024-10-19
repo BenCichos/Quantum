@@ -24,7 +24,8 @@ end
 
 function sgqt(ρ̂::Operator{2}, iterations::Int; paramsᵦ::NamedTuple=(;b=0.1, t=1/6), paramsᵧ::NamedTuple=(;a=3.0, A=0.0, s=1.0))
     ϕᵢ = rand(Ket{2})
-    ψs = Ket{2}[ϕᵢ]
+    ψs = Ket{2}[]
+    sizehint!(ψs, iterations)
     for i in 1:iterations
         push!(ψs, ϕᵢ)
         ϕᵢ = sgqt_walk(ρ̂, ϕᵢ, i, paramsᵦ, paramsᵧ)
@@ -49,7 +50,8 @@ end
 
 function sgqt(ρ̂::Operator{4}, iterations::Int; measures::AbstractVector=paulimatrices(4), cardinality::Int=8, paramsᵦ::NamedTuple=(;b=0.1, t=1/6), paramsᵧ::NamedTuple=(;a=3.0, A=0.0, s=1.0), weights::Vector{Float64}=fill(1/16, 16))
     ϕᵢ = rand(Ket{4})
-    ψs = Ket{4}[ϕᵢ]
+    ψs = Ket{4}[]
+    sizehint!(ψs, iterations)
     for i in 1:iterations
         push!(ψs, ϕᵢ)
         ϕᵢ = sgqt_walk(ρ̂, ϕᵢ, measures, cardinality, i, paramsᵦ, paramsᵧ, weights)
